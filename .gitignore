@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+venv/
+.env
+.env.*
+
+# VSCode
+.vscode/
+.history/
+
+# Pytest / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Docker
+*.log
+dist/
+build/
+
+# Node (quando criarmos o frontend)
+node_modules/
+dist/
