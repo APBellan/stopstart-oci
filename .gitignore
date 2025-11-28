@@ -26,3 +26,5 @@ build/
 # Node (quando criarmos o frontend)
 node_modules/
 dist/
+
+dicas.txt
