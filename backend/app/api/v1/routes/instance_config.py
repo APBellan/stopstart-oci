@@ -2,6 +2,7 @@
 
 import logging
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -18,11 +19,10 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-
 DbSessionDep = Annotated[Session, Depends(get_db)]
 
 
-def _get_instance_or_404(db: Session, instance_id: str) -> Instance:
+def _get_instance_or_404(db: Session, instance_id: UUID) -> Instance:
     instance = (
         db.query(Instance)
         .filter(Instance.id == instance_id)
@@ -42,14 +42,15 @@ def _get_instance_or_404(db: Session, instance_id: str) -> Instance:
     response_model=InstanceConfigResponse,
 )
 def get_instance_config(
-    instance_id: str,
+    instance_id: UUID,
     db: DbSessionDep,
 ) -> InstanceConfigResponse:
     """
     Retorna a configuração da instância.
 
     - Se a instância não existir → 404.
-    - Se não existir config em InstanceConfig → objeto default (managed=False, etc., configurado=False).
+    - Se não existir config em InstanceConfig → objeto default
+      (managed=False, protection_flag=False, timezone='UTC', configurado=False).
     """
     instance = _get_instance_or_404(db, instance_id)
 
@@ -67,7 +68,7 @@ def get_instance_config(
         )
         return InstanceConfigResponse(
             instance_id=instance.id,
-            # demais campos usam os defaults do schema (managed=False, etc.)
+            # demais campos usam os defaults do schema
             configurado=False,
         )
 
@@ -82,7 +83,7 @@ def get_instance_config(
     response_model=InstanceConfigResponse,
 )
 def upsert_instance_config(
-    instance_id: str,
+    instance_id: UUID,
     payload: InstanceConfigUpdate,
     db: DbSessionDep,
 ) -> InstanceConfigResponse:
@@ -108,7 +109,7 @@ def upsert_instance_config(
         cfg = InstanceConfig(instance_id=instance.id)
         db.add(cfg)
 
-    # Aplica os campos do payload no modelo (update parcial, se desejar)
+    # Aplica os campos do payload no modelo (update parcial)
     update_data = payload.model_dump(exclude_unset=True)
     for field_name, value in update_data.items():
         # Garante que só aplica atributos que existem no modelo InstanceConfig
@@ -132,7 +133,7 @@ def upsert_instance_config(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_instance_config(
-    instance_id: str,
+    instance_id: UUID,
     db: DbSessionDep,
 ) -> None:
     """

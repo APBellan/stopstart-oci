@@ -2,77 +2,107 @@
 
 from __future__ import annotations
 
-from datetime import time
-from typing import List, Optional
+from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class InstanceConfigBase(BaseModel):
     """
-    Campos comuns de configuração de instância.
-
-    Ajuste os campos de agendamento/parametrização para bater 100% com o
-    modelo SQLAlchemy InstanceConfig que você já tem.
+    Campos de configuração de instância, alinhados ao modelo SQLAlchemy InstanceConfig.
     """
 
     managed: bool = Field(
         False,
         description="Se a instância é gerenciada (stop/start automático) pela aplicação.",
     )
+
     protection_flag: bool = Field(
         False,
-        description="Se a instância está protegida contra operações automáticas.",
+        description="Se a instância está protegida contra operações automáticas (bloqueia stop).",
     )
 
-    # ====== EXEMPLOS de campos de agendamento (ajuste para o seu modelo real) ======
-    start_time: Optional[time] = Field(
+    default_start_cron: Optional[str] = Field(
         None,
-        description="Horário diário de start automático (no timezone configurado).",
+        description="Expressão CRON padrão para start da instância.",
+        examples=["0 8 * * 1-5"],
     )
-    stop_time: Optional[time] = Field(
+
+    default_stop_cron: Optional[str] = Field(
         None,
-        description="Horário diário de stop automático (no timezone configurado).",
+        description="Expressão CRON padrão para stop da instância.",
+        examples=["0 20 * * 1-5"],
     )
+
+    timezone: str = Field(
+        "UTC",
+        description="Timezone IANA utilizado para o agendamento (ex.: 'America/Sao_Paulo').",
+    )
+
+    notes: Optional[str] = Field(
+        None,
+        description="Notas livres para administrador sobre a configuração desta instância.",
+    )
+
+
+class InstanceConfigUpdate(BaseModel):
+    """
+    Payload de upsert/atualização da configuração (PUT).
+
+    Todos os campos são opcionais para permitir updates parciais.
+    No serviço usamos exclude_unset=True para aplicar só o que veio no payload.
+    """
+
+    managed: Optional[bool] = Field(
+        None,
+        description="Se a instância é gerenciada (stop/start automático) pela aplicação.",
+    )
+
+    protection_flag: Optional[bool] = Field(
+        None,
+        description="Se a instância está protegida contra operações automáticas (bloqueia stop).",
+    )
+
+    default_start_cron: Optional[str] = Field(
+        None,
+        description="Expressão CRON padrão para start da instância.",
+        examples=["0 8 * * 1-5"],
+    )
+
+    default_stop_cron: Optional[str] = Field(
+        None,
+        description="Expressão CRON padrão para stop da instância.",
+        examples=["0 20 * * 1-5"],
+    )
+
     timezone: Optional[str] = Field(
         None,
         description="Timezone IANA utilizado para o agendamento (ex.: 'America/Sao_Paulo').",
     )
-    days_of_week: Optional[List[str]] = Field(
-        default=None,
-        description="Lista de dias da semana em que o agendamento se aplica (ex.: ['mon', 'tue']).",
+
+    notes: Optional[str] = Field(
+        None,
+        description="Notas livres para administrador sobre a configuração desta instância.",
     )
-    # ============================================================================
-    # Se no seu modelo existir algo como "custom_schedule", "window_start", etc,
-    # adicione aqui com o mesmo nome para facilitar o .model_validate(cfg).
-    # ============================================================================
-
-
-class InstanceConfigUpdate(InstanceConfigBase):
-    """
-    Payload de upsert de configuração de instância (PUT).
-
-    Aqui você pode tornar alguns campos opcionais se quiser permitir updates parciais
-    (usando exclude_unset=True na hora de aplicar no modelo).
-    Por simplicidade, estou mantendo igual ao base.
-    """
-    pass
 
 
 class InstanceConfigResponse(InstanceConfigBase):
     """
     Schema de resposta para configuração de instância.
 
-    - instance_id: chave da instância (FK para instances.id)
-    - configurado: True se existe registro persistido, False se é retorno default.
+    - instance_id: chave da instância (FK para instances.id, UUID).
+    - configurado: True se existe registro persistido em InstanceConfig;
+                   False se é retorno default (sem registro no banco).
     """
 
     model_config = ConfigDict(from_attributes=True)
 
-    instance_id: str = Field(
+    instance_id: UUID = Field(
         ...,
-        description="Identificador da instância (igual ao da tabela instances).",
+        description="Identificador da instância (igual ao da tabela instances, UUID).",
     )
+
     configurado: bool = Field(
         False,
         description=(
