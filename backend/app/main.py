@@ -3,6 +3,7 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.core.config import get_settings
@@ -20,6 +21,20 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.APP_NAME,
         version="0.1.0",
+    )
+    
+    origins = [
+        "http://localhost:5173",  # Vite dev
+        "http://localhost",       # Nginx local
+        "http://frontend",        # nome do serviço no docker compose (exemplo)
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     api_v1_prefix = "/api/v1"

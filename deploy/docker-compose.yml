@@ -33,6 +33,16 @@ services:
     networks:
       - app_net
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stopstart-frontend
+    ports:
+      - "3000:80"    # acessa em http://localhost:3000
+    depends_on:
+      - api
+
 networks:
   app_net:
 
