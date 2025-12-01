@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     ForeignKey,
@@ -13,7 +14,9 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
-from ..db.base import Base  # ajuste se o caminho do Base for diferente
+from ..db.base_class import Base
+# ou, se preferir absoluto:
+# from app.db.base_class import Base
 
 
 class Instance(Base):
@@ -60,6 +63,14 @@ class Instance(Base):
         String(1024),
         nullable=True,
         doc="cache do path do compartment para facilitar filtros",
+    )
+
+    # Ativo / inativo (para quando some do OCI)
+    is_active = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+        index=True,
     )
 
     # Timestamps

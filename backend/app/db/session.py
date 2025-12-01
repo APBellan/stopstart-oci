@@ -7,6 +7,8 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from app.core.config import get_settings
 
+from app.db import base  # noqa: F401
+
 settings = get_settings()
 
 # echo=True em dev ajuda bastante a ver as queries no log

@@ -14,7 +14,9 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from ..db.base import Base  # ajuste se o caminho do Base for diferente
+from ..db.base_class import Base
+# ou, se preferir absoluto:
+# from app.db.base_class import Base
 
 
 class InstanceConfig(Base):

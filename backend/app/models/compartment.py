@@ -15,7 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from ..db.base import Base  # ajuste se o caminho do Base for diferente
+from ..db.base_class import Base
 
 
 class Compartment(Base):
@@ -48,6 +48,14 @@ class Compartment(Base):
     path = Column(String(1024), nullable=False, index=True)
 
     is_tenancy_root = Column(Boolean, nullable=False, default=False)
+
+    # Ativo / inativo (para quando some do OCI)
+    is_active = Column(
+        Boolean,
+        nullable=False,
+        default=True,
+        index=True,
+    )
 
     # Timestamps
     created_at = Column(

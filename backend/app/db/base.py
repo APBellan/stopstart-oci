@@ -1,12 +1,10 @@
-from sqlalchemy.orm import DeclarativeBase
+from .base_class import Base  # noqa: F401
 
-class Base(DeclarativeBase):
-    """Base do SQLAlchemy para todas as tabelas."""
-    pass
-
-
-# IMPORTANTE: importar os models para que as tabelas entrem em Base.metadata
-# Ajuste os caminhos/nomes conforme estiverem no seu projeto
+# Importa todos os models para que o Alembic/SQLAlchemy conheçam as tabelas
 from app.models.compartment import Compartment  # noqa: F401
-from app.models.instance import Instance        # noqa: F401
+from app.models.instance import Instance  # noqa: F401
 from app.models.instance_config import InstanceConfig  # noqa: F401
+
+# Se tiver outros models, importa aqui também
+# from app.models.user import User  # noqa: F401
+# ...

@@ -22,6 +22,7 @@ services:
     working_dir: /app
     volumes:
       - ../backend:/app       # 👈 MONTA o backend do host em /app no container
+      - ../.oci:/root/.oci:ro
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql+psycopg2://stopstart:stopstart@db:5432/stopstart

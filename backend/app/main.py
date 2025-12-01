@@ -6,7 +6,9 @@ from fastapi import FastAPI
 from sqlalchemy import text
 
 from app.core.config import get_settings
-from app.api.v1 import health as health_routes
+from app.api.v1.routes import health as health_routes
+from app.api.v1.routes import compartments as compartments_routes  # 👈 novo import
+from app.api.v1.routes import instance_config as instance_config_routes
 from app.db.session import SessionLocal
 from app.models.base import Base  # garante que Base está disponível
 
@@ -21,10 +23,26 @@ def create_app() -> FastAPI:
     )
 
     api_v1_prefix = "/api/v1"
+
+    # Health check
     app.include_router(
         health_routes.router,
         prefix=api_v1_prefix,
         tags=["health"],
+    )
+    
+    # Rotas de configuração de instância
+    app.include_router(
+        instance_config_routes.router,
+        prefix=api_v1_prefix,
+        tags=["instance-config"],
+    )
+
+    # Navegação hierárquica de compartments
+    app.include_router(
+        compartments_routes.router,
+        prefix=api_v1_prefix,
+        tags=["compartments"],
     )
 
     @app.on_event("startup")
