@@ -27,4 +27,4 @@ build/
 node_modules/
 dist/
 
-dicas.txt
+dicas*.txt

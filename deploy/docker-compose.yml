@@ -3,12 +3,13 @@ version: "3.9"
 services:
   db:
     image: postgres:16
+    platform: linux/amd64
     environment:
       POSTGRES_USER: stopstart
       POSTGRES_PASSWORD: stopstart
       POSTGRES_DB: stopstart
     ports:
-      - "5433:5432"        # porta externa 5433 -> interna 5432
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -18,6 +19,9 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ../backend:/app       # 👈 MONTA o backend do host em /app no container
     environment:
       APP_ENV: development
       DATABASE_URL: postgresql+psycopg2://stopstart:stopstart@db:5432/stopstart

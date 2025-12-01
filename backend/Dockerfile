@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS base
+FROM python:3.12-slim-bookworm AS base
 
 # Evita criação de .pyc e força stdout imediato
 ENV PYTHONDONTWRITEBYTECODE=1
